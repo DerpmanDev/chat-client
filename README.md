@@ -1,1 +1,1 @@
-A online chat client using express.js as the backend.
+A online chat client using express.js & socket.io as the backend.
