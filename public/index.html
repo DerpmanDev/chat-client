@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Online Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+    
+    #chat-container {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: scroll;
+    }
+    
+    form {
+      margin-top: 20px;
+    }
+    
+    input[type="text"] {
+      width: 70%;
+      padding: 5px;
+    }
+    
+    button {
+      padding: 5px 10px;
+      margin-left: 10px;
+    }
+    
+    #name-changer {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Online Chat</h1>
+  
+  <div id="chat-container"></div>
+  
+  <form id="message-form">
+    <input type="text" id="message-input" placeholder="Enter your message..." />
+    <button type="submit">Send</button>
+  </form>
+  
+  <button id="name-changer">Change Name</button>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let userName;
+
+    // Display a message in the chat container
+    function displayMessage(message) {
+      const chatContainer = document.getElementById('chat-container');
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      chatContainer.appendChild(messageElement);
+    }
+
+    // Function to handle sending a message
+    function sendMessage(event) {
+      event.preventDefault();
+      const messageInput = document.getElementById('message-input');
+      const message = messageInput.value;
+
+      // Send the message to the server
+      socket.emit('message', message);
+
+      // Clear the input field
+      messageInput.value = '';
+    }
+
+    // Add an event listener to the message form
+    const messageForm = document.getElementById('message-form');
+    messageForm.addEventListener('submit', sendMessage);
+
+    // Display a message when a user joins the chat
+    socket.on('userJoin', (name) => {
+      displayMessage(`${name} has joined the chat.`);
+    });
+
+    // Display a message when a user leaves the chat
+    socket.on('userLeave', (name) => {
+      displayMessage(`${name} has left the chat.`);
+    });
+
+    // Display a message when a user changes their username
+    socket.on('userChange', (data) => {
+      const { prevUserName, newUserName } = data;
+      displayMessage(`${prevUserName} has changed their username to ${newUserName}.`);
+    });
+
+    // Display received messages
+    socket.on('message', (data) => {
+      const { user, message } = data;
+      displayMessage(`${user}: ${message}`);
+    });
+
+    // Function to handle changing the user's name
+    function changeName() {
+      const newUserName = prompt('Enter your new name:');
+
+      if (newUserName) {
+        // Display a message in the chat container
+        displayMessage(`${userName} has changed their username to ${newUserName}.`);
+
+        // Update the user's name
+        userName = newUserName;
+
+        // Notify the server of the name change
+        socket.emit('join', userName);
+      }
+    }
+
+    // Add an event listener to the name changer button
+    const nameChanger = document.getElementById('name-changer');
+    nameChanger.addEventListener('click', changeName);
+
+    // Prompt the user to set their name
+    userName = prompt('Please enter your name:');
+    socket.emit('join', userName);
+  </script>
+</body>
+</html>
