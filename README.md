@@ -3,6 +3,11 @@
 * Express.js
 * Node-fetch
 * Socket.io
+### Features
+* Fast & Simple Design
+* Saves your nickname
+* Nickname changer
+* Notifys you when a user joins, leaves, and changes their nickname
 #### Local hosting (it's going to be lonely):
 ```
 git clone https://github.com/DerpmanDev/chat-client.git
