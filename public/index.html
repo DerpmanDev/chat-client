@@ -54,7 +54,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    let userName;
+    let userName = localStorage.getItem('userName');
 
     // Display a message in the chat container
     function displayMessage(message) {
@@ -116,6 +116,9 @@
 
         // Notify the server of the name change
         socket.emit('join', userName);
+
+        // Save the username in localStorage
+        localStorage.setItem('userName', userName);
       }
     }
 
@@ -123,8 +126,12 @@
     const nameChanger = document.getElementById('name-changer');
     nameChanger.addEventListener('click', changeName);
 
-    // Prompt the user to set their name
-    userName = prompt('Please enter your name:');
+    // Prompt the user to set their name if not already stored
+    if (!userName) {
+      userName = prompt('Please enter your name:');
+      localStorage.setItem('userName', userName);
+    }
+
     socket.emit('join', userName);
   </script>
 </body>
